@@ -47,11 +47,17 @@ After correct initialisation the smart meter starts sending packets with data.
 ### Main View
 You can see the values in the Main-View of Tasmota:
 
+<img src='images/TD3511MBUS-Tasmota-LoRa - Main Menu.png' width='400'>
+
 ### Berry Console
-The Berry Console gives more output
+The Berry Console gives more debug output
+
+<img src='images/TD3511MBUS-Tasmota-LoRa - Berry Console.png' width='400'>
 
 ### MQTT
 At the moment only some values are sento via MQTT with the constant "Z1" for the first (and now only) smart meter.
+
+<img src='images/TD3511MBUS-JSON-Output.png' width='400'>
 
 ## Disclaimer
 This software is in a very pre-beta-state! 
