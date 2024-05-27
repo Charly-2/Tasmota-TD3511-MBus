@@ -226,3 +226,7 @@ class TD3511MBUS : Driver
 	end
 
 end
+
+# Create a driver instance and register as Tasmota Driver
+td3511=TD3511MBUS()
+tasmota.add_driver(td3511)
