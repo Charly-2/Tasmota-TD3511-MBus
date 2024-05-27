@@ -1,12 +1,21 @@
-# Berry Script for Smart-Meter Siemens TD-3511 in Upper Austria (Netz OÖ)
+# Berry Script for Smart-Meter Siemens TD-3511 in Upper Austria (Netz OÃ–)
 # Read Values via M-Bus-Protocol every Second
 class TD3511MBUS : Driver
+	#########################
+	# Change to your needs
+	# AES-Key
+	static var KEY = bytes('11C5151F9CB6EFD13E411B815CD62769')
+	# Serial RX-Pin
+	static var DEF_RX_PIN = 46
+	# Serial TX-Pin
+	static var DEF_TX_PIN = 45
+	##########################
+
 	# serial port
 	var ser
-	# max number for reading more data
+	# max number of tries for reading more data
 	var reread_count
-	# AES-Key
-	static var key = bytes('11C5151F9CB6EFD13E411B815CD62769')
+
 	# Values from smart meter
 	var zeit
 	var datum
@@ -38,8 +47,8 @@ class TD3511MBUS : Driver
 		self.r_4_8_1 = 0.0
 		self.r_1_128_0 = 0.0
 		# default if nil
-		if !tx tx=45 end
-		if !rx rx=46 end
+		if !tx tx=self.DEF_TX_PIN end
+		if !rx rx=self.DEF_RX_PIN end
 		self.ser = serial(rx,tx,9600,serial.SERIAL_8E1)
 	end
 	
@@ -57,10 +66,10 @@ class TD3511MBUS : Driver
 		end
 		var payload = message[19..98]
 		#print("iv: " + iv.tohex())
-		#print("key:" + self.key.tohex())
+		#print("key:" + self.KEY.tohex())
 		#print("enc:" + payload.tohex())
 		var aes = crypto.AES_CBC()
-		aes.decrypt1(self.key, iv, payload)
+		aes.decrypt1(self.KEY, iv, payload)
 		#print("dec:" + payload.tohex())
 		if payload[0..1] != bytes('2F2F') return "wrong decoded message format" end
 		# decode the values
@@ -88,12 +97,14 @@ class TD3511MBUS : Driver
 		print("Datum:" + self.datum)
 		self.r_1_7_0 = v_1_7_0
 		self.r_2_7_0 = v_2_7_0
+		# in k
 		self.r_1_8_0 = v_1_8_0/1000.0
 		self.r_2_8_0 = v_2_8_0/1000.0
 		self.r_3_7_0 = v_3_7_0
 		self.r_4_7_0 = v_4_7_0	
-		self.r_3_8_1 = v_3_8_1
-		self.r_4_8_1 = v_4_8_1
+		#in k
+		self.r_3_8_1 = v_3_8_1/1000.0
+		self.r_4_8_1 = v_4_8_1/1000.0
 		self.r_1_128_0 = v_1_128_0/1000.0
 		print(string.format("1.7.0   : %9d W", self.r_1_7_0))
 		print(string.format("2.7.0   : %9d W", self.r_2_7_0))
@@ -101,8 +112,8 @@ class TD3511MBUS : Driver
 		print(string.format("2.8.0   : %9.3f kWh", self.r_2_8_0))
 		print(string.format("3.7.0   : %9d var", self.r_3_7_0))
 		print(string.format("4.7.0   : %9d var", self.r_4_7_0))
-		print(string.format("3.8.1   : %9d varh", self.r_3_8_1))
-		print(string.format("4.8.1   : %9d varh", self.r_4_8_1))
+		print(string.format("3.8.1   : %9.3f kvarh", self.r_3_8_1))
+		print(string.format("4.8.1   : %9.3f kvarh", self.r_4_8_1))
 		print(string.format("1.128.0 : %9.3f kWh", self.r_1_128_0))
 		return "OK"
 	end
@@ -170,16 +181,16 @@ class TD3511MBUS : Driver
 		var msg = string.format(
 				 "{s}Z1 Time{m}%s"..
 				 "{s}Z1 Date{m}%s"..
-				 "{s}Z1 1.7.0{m} %.0f W{e}"..
-				 "{s}Z1 2.7.0{m} %.0f W{e}"..
-				 "{s}Z1 1.7.0 - 2.7.0{m} %.0f W{e}"..
-				 "{s}Z1 1.8.0{m} %9.3f kWh{e}"..
-				 "{s}Z1 2.8.0{m} %9.3f kWh{e}"..
-				 "{s}Z1 3.7.0{m} %.0f var{e}"..
-				 "{s}Z1 4.7.0{m} %.0f var{e}"..
-				 "{s}Z1 3.8.1{m} %.0f varh{e}"..
-				 "{s}Z1 4.8.1{m} %.0f varh{e}"..
-				 "{s}Z1 1.128.0{m} %9.3f kWh{e}",
+				 "{s}Z1 1.7.0(Wirk-L. P+){m} %.0f W{e}"..
+				 "{s}Z1 2.7.0(Wirk-L. P-){m} %.0f W{e}"..
+				 "{s}Z1 1.7.0 - 2.7.0(Saldo-L.){m} %.0f W{e}"..
+				 "{s}Z1 1.8.0(Energie A+){m} %9.3f kWh{e}"..
+				 "{s}Z1 2.8.0(Energie A-){m} %9.3f kWh{e}"..
+				 "{s}Z1 3.7.0(Blind-L. Q+){m} %.0f var{e}"..
+				 "{s}Z1 4.7.0(Blind-L. Q-){m} %.0f var{e}"..
+				 "{s}Z1 3.8.1(Energie R+){m} %.0f kvarh{e}"..
+				 "{s}Z1 4.8.1(Energie R-){m} %.0f kvarh{e}"..
+				 "{s}Z1 1.128.0(Inkasso-Energie){m} %9.3f kWh{e}",
 				  self.zeit,self.datum, 
 				  self.r_1_7_0,
 				  self.r_2_7_0,
