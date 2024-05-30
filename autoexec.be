@@ -2,9 +2,8 @@
 
 # Load the Driver-Class
 load("td3511_mbus")
+print "TD3511MBUS: Driver loaded"
+# Create one or more td3511 Instancees
+load("td3511_setup.be")
+print "TD3511MBUS initialized"
 
-# Create a td3511 Instance
-# Does not work here!?
-#td3511=TD3511MBUS()
-#Register as Tasmota-Driver and start
-#tasmota.add_driver(td3511)
