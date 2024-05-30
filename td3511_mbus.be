@@ -2,17 +2,23 @@
 # Read Values via M-Bus-Protocol every Second
 class TD3511MBUS : Driver
 	#########################
-	# Change to your needs
+	# Defaults, if not set in Constructor
 	# AES-Key
-	static var KEY = bytes('11C5151F9CB6EFD13E411B815CD62769')
+	static var DEF_KEY = bytes('11C5151F9CB6EFD13E411B815CD62769')
 	# Serial RX-Pin
 	static var DEF_RX_PIN = 46
 	# Serial TX-Pin
 	static var DEF_TX_PIN = 45
+	# ID for Smart-Meter in MQTT and Main-View
+	static var DEF_ID = 'M1'
 	##########################
 
 	# serial port
 	var ser
+	# AES KEy
+	var key
+	# ID for Smart-Meter
+	var sm_id
 	# max number of tries for reading more data
 	var reread_count
 
@@ -31,7 +37,18 @@ class TD3511MBUS : Driver
 	
 	
 	#Constructor
-	def init(rx, tx)
+	# Parameters
+	# rx		rx-pin for serial
+	# tx		tx-pin for Serial
+	# aes_key	AES-Key for Smart-Meter
+	# id		ID for Smart-Meter in MQTT and MainView
+	def init(rx, tx, aes_key, id)
+		# default if nil
+		if !tx tx=self.DEF_TX_PIN end
+		if !rx rx=self.DEF_RX_PIN end
+		if !aes_key self.key = self.DEF_KEY else self.key = aes_key end
+		if !id self.sm_id = self.DEF_ID else self.sm_id = id end
+
 		self.reread_count = 0
 		self.zeit = ""
 		self.datum = ""
@@ -46,9 +63,7 @@ class TD3511MBUS : Driver
 		self.r_3_8_1 = 0.0
 		self.r_4_8_1 = 0.0
 		self.r_1_128_0 = 0.0
-		# default if nil
-		if !tx tx=self.DEF_TX_PIN end
-		if !rx rx=self.DEF_RX_PIN end
+		
 		self.ser = serial(rx,tx,9600,serial.SERIAL_8E1)
 	end
 	
@@ -66,10 +81,10 @@ class TD3511MBUS : Driver
 		end
 		var payload = message[19..98]
 		#print("iv: " + iv.tohex())
-		#print("key:" + self.KEY.tohex())
+		#print("key:" + self.key.tohex())
 		#print("enc:" + payload.tohex())
 		var aes = crypto.AES_CBC()
-		aes.decrypt1(self.KEY, iv, payload)
+		aes.decrypt1(self.key, iv, payload)
 		#print("dec:" + payload.tohex())
 		if payload[0..1] != bytes('2F2F') return "wrong decoded message format" end
 		# decode the values
@@ -179,8 +194,8 @@ class TD3511MBUS : Driver
 		if !self.ser return nil end
 		import string
 		var msg = string.format(
-				 "{s}Z1 Time{m}%s"..
-				 "{s}Z1 Date{m}%s"..
+				 "{s}Z1 Zeit{m}%s"..
+				 "{s}Z1 Datum{m}%s"..
 				 "{s}Z1 1.7.0(Wirk-L. P+){m} %.0f W{e}"..
 				 "{s}Z1 2.7.0(Wirk-L. P-){m} %.0f W{e}"..
 				 "{s}Z1 1.7.0 - 2.7.0(Saldo-L.){m} %.0f W{e}"..
@@ -203,6 +218,8 @@ class TD3511MBUS : Driver
 				  self.r_4_8_1,
 				  self.r_1_128_0
 				  )
+		# replace Z1 with defined smart meter ID
+		msg = string.replace(msg,"Z1",self.sm_id)
 		# send to gui with decimal point as locale defined
 		tasmota.web_send_decimal(msg)
 	end
@@ -210,13 +227,14 @@ class TD3511MBUS : Driver
 	#- add smart meter value to teleperiod -#
 	def json_append()
 		import string
-		var msg = string.format(",\"Z1\":{\"time\":\"%s\",\"date\":\"%s\",\"Total_in\":%9.3f,\"Total_out\":%9.3f,\"P_in\":%.0f,\"P_out\":%.0f,\"P_total\":%.0f}",
-				  self.zeit, self.datum,
-				  self.r_1_8_0,
-				  self.r_2_8_0,
-				  self.r_1_7_0,
-				  self.r_2_7_0,
-				  self.r_1_7_0 - self.r_2_7_0)
+		var msg = string.format(",\"%s\":{\"time\":\"%s\",\"date\":\"%s\",\"Total_in\":%9.3f,\"Total_out\":%9.3f,\"P_in\":%.0f,\"P_out\":%.0f,\"P_total\":%.0f}",
+				self.sm_id,  
+				self.zeit, self.datum,
+				self.r_1_8_0,
+				self.r_2_8_0,
+				self.r_1_7_0,
+				self.r_2_7_0,
+				self.r_1_7_0 - self.r_2_7_0)
 		tasmota.response_append(msg)
 	end	
 	
@@ -226,7 +244,3 @@ class TD3511MBUS : Driver
 	end
 
 end
-
-# Create a driver instance and register as Tasmota Driver
-td3511=TD3511MBUS()
-tasmota.add_driver(td3511)
