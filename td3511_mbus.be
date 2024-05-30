@@ -188,8 +188,8 @@ class TD3511MBUS : Driver
 				 "{s}Z1 2.8.0(Energie A-){m} %9.3f kWh{e}"..
 				 "{s}Z1 3.7.0(Blind-L. Q+){m} %.0f var{e}"..
 				 "{s}Z1 4.7.0(Blind-L. Q-){m} %.0f var{e}"..
-				 "{s}Z1 3.8.1(Energie R+){m} %.0f kvarh{e}"..
-				 "{s}Z1 4.8.1(Energie R-){m} %.0f kvarh{e}"..
+				 "{s}Z1 3.8.1(Energie R+){m} %9.3f kvarh{e}"..
+				 "{s}Z1 4.8.1(Energie R-){m} %9.3f kvarh{e}"..
 				 "{s}Z1 1.128.0(Inkasso-Energie){m} %9.3f kWh{e}",
 				  self.zeit,self.datum, 
 				  self.r_1_7_0,
