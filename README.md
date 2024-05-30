@@ -1,10 +1,11 @@
 # Tasmota-TD3511-MBus
 Tasmota Berry Script for Smart Meter TD-3511 used in Upper Austria (Netz OÖ)
 
-## Decription
+## Description
 This Berry Script can be used with Tasmota https://tasmota.github.io/docs/ on ESP32-Modules.
 It can read Siemens Smart Meters of Type TD-3511 which are used in Uppper Austria by Netz OÖ.
-The script acts as M-Bus client and reads the values provided by the smart meter every second.
+The script acts as M-Bus client and reads the values provided by the smart meters every second.
+More than one smart meter can be attached to an ESP32 and read out.
 
 I didn't find a way to use the https://tasmota.github.io/docs/Smart-Meter-Interface/ to act as M-Bus-Client, so i tried Berry Scripting...
 
@@ -18,8 +19,9 @@ Specification of AMIS Smart Meter M-Bus interface: https://www.netzooe.at/2021-1
 Other FAQs from Netz-OÖ: https://www.netzooe.at/themen/information/smart-meter/faq
 
 
-## Requirements
-You need to compile a Tasmota version with minimal this settings - see https://tasmota.github.io/docs/Compile-your-build/
+## Requirements / Setup
+#### Compile Tasmota with Berry and Crypto-Support
+You need to compile a Tasmota version with this minimal settings - see https://tasmota.github.io/docs/Compile-your-build/
 ```
 // Berry cripting and SML for SmartMeters
 #ifndef USE_SCRIPT
@@ -41,14 +43,29 @@ You need to compile a Tasmota version with minimal this settings - see https://t
   #define USE_BERRY_CRYPTO_AES_CBC
 #endif
 ```
-
+### Serial IR Smart-meter Reader
 For every smart meter you need a IR-Serial-Transceiver connected to ESP32 Serial Pins
 Like this one: https://www.amazon.de/Hichi/dp/B0BPMVX4VW?th=1
 
+### Upload Berry Script-Files
+Upload all *.be Files via the Tasmota-Web-Interface to the ESP32 (Tools -> Magae Files Systems)
+
+<img src='images/TD3511MBUS-Tasmota-LoRa - Manage File system.png' width='400'>
+
+### Configure Script
+Edit the file td3511_setup.be and change RX/TX-Pins and AES-KEY and ID for every smart meter you need
+
+### Configure Teleperiod
+The frequency for sending MQTT-Messages must be adjusted in Tasmota:  
+
+Configuration->Configure Logging-> Telemetry period (e.g. 10seconds)
+
+### Reboot the ESP32 
+Reboot from Tasmota Main-Menu and wait....
+
+
 ## Usage
 After correct initialisation the smart meter starts sending packets with data.
-
-The frequency for sending MQTT-Messages must be adjusted in "Configuration->Configure Logging-> Telemetry period (e.g. 10seconds)
 
 ### Main View
 You can see the values in the Main-View of Tasmota:
