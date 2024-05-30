@@ -3,7 +3,7 @@ Tasmota Berry Script for Smart Meter TD-3511 used in Upper Austria (Netz OÖ)
 
 ## Description
 This Berry Script can be used with Tasmota https://tasmota.github.io/docs/ on ESP32-Modules.
-It can read Siemens Smart Meters of Type TD-3511 which are used in Uppper Austria by Netz OÖ.
+It can read Siemens Smart Meters of Type TD-3511 which are used in Uppper Austria by Netz OÖ / Energie AG.
 The script acts as M-Bus client and reads the values provided by the smart meters every second.
 More than one smart meter can be attached to an ESP32 and read out.
 
@@ -44,16 +44,26 @@ You need to compile a Tasmota version with this minimal settings - see https://t
 #endif
 ```
 ### Serial IR Smart-meter Reader
-For every smart meter you need a IR-Serial-Transceiver connected to ESP32 Serial Pins
+For every smart meter you need a IR-Serial-Transceiver connected to ESP32 Serial Pins (you need RX and TX)
+
 Like this one: https://www.amazon.de/Hichi/dp/B0BPMVX4VW?th=1
 
 ### Upload Berry Script-Files
-Upload all *.be Files via the Tasmota-Web-Interface to the ESP32 (Tools -> Magae Files Systems)
+Upload all *.be Files via the Tasmota-Web-Interface to the ESP32 (Tools -> Manage File System)
 
 <img src='images/TD3511MBUS-Tasmota-LoRa - Manage File system.png' width='400'>
 
 ### Configure Script
-Edit the file td3511_setup.be and change RX/TX-Pins and AES-KEY and ID for every smart meter you need
+Edit the file td3511_setup.be and change RX/TX-Pins and AES-KEY and ID for every smart meter you need. You can edit in Tasmota with the "Edit-Icon" in Manage Filesystem.
+
+The Section for Initializing one Smart-Meter looks like this:
+
+```
+# Zähler Haushalt
+td3511_HH=TD3511MBUS(46,45,bytes('11C5151F9CB6EFD13E411B815CD62769'), "Z1")
+tasmota.add_driver(td3511_HH)
+print("Driver td3511_HH:TD3511MBUS initialized")
+```
 
 ### Configure Teleperiod
 The frequency for sending MQTT-Messages must be adjusted in Tasmota:  
