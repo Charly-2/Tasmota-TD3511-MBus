@@ -78,7 +78,7 @@ Reboot from Tasmota Main-Menu and wait....
 After correct initialisation the smart meter starts sending packets with data.
 
 ### Main View
-You can see the values in the Main-View of Tasmota:
+You can see the values in the Tasmota WEB-UserInterface Main-View:
 
 <img src='images/TD3511MBUS-Tasmota-LoRa - Main Menu.png' width='400'>
 
@@ -88,7 +88,7 @@ The Berry Console gives more debug output
 <img src='images/TD3511MBUS-Tasmota-LoRa - Berry Console.png' width='400'>
 
 ### MQTT
-At the moment only some values are sento via MQTT with the constant "Z1" for the first (and now only) smart meter.
+At the moment only some values are sent via MQTT for every smart meter.
 
 <img src='images/TD3511MBUS-JSON-Output.png' width='400'>
 
