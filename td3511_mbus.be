@@ -108,8 +108,6 @@ class TD3511MBUS : Driver
 		var v_1_128_0 = payload[74..77].geti(0,4)
 		self.zeit = string.format("%02d:%02d:%02d",v_0_9_1_hour, v_0_9_1_min, v_0_9_1_sec)
 		self.datum = string.format("%04d-%02d-%02d",v_0_9_1_year, v_0_9_1_mon, v_0_9_1_day)
-		print("Zeit:" + self.zeit)
-		print("Datum:" + self.datum)
 		self.r_1_7_0 = v_1_7_0
 		self.r_2_7_0 = v_2_7_0
 		# in k
@@ -121,15 +119,17 @@ class TD3511MBUS : Driver
 		self.r_3_8_1 = v_3_8_1/1000.0
 		self.r_4_8_1 = v_4_8_1/1000.0
 		self.r_1_128_0 = v_1_128_0/1000.0
-		print(string.format("1.7.0   : %9d W", self.r_1_7_0))
-		print(string.format("2.7.0   : %9d W", self.r_2_7_0))
-		print(string.format("1.8.0   : %9.3f kWh", self.r_1_8_0))
-		print(string.format("2.8.0   : %9.3f kWh", self.r_2_8_0))
-		print(string.format("3.7.0   : %9d var", self.r_3_7_0))
-		print(string.format("4.7.0   : %9d var", self.r_4_7_0))
-		print(string.format("3.8.1   : %9.3f kvarh", self.r_3_8_1))
-		print(string.format("4.8.1   : %9.3f kvarh", self.r_4_8_1))
-		print(string.format("1.128.0 : %9.3f kWh", self.r_1_128_0))
+		print(self.sm_id, "Zeit:" + self.zeit)
+		print(self.sm_id, "Datum:" + self.datum)
+		print(self.sm_id, string.format("1.7.0   : %9d W", self.r_1_7_0))
+		print(self.sm_id, string.format("2.7.0   : %9d W", self.r_2_7_0))
+		print(self.sm_id, string.format("1.8.0   : %9.3f kWh", self.r_1_8_0))
+		print(self.sm_id, string.format("2.8.0   : %9.3f kWh", self.r_2_8_0))
+		print(self.sm_id, string.format("3.7.0   : %9d var", self.r_3_7_0))
+		print(self.sm_id, string.format("4.7.0   : %9d var", self.r_4_7_0))
+		print(self.sm_id, string.format("3.8.1   : %9.3f kvarh", self.r_3_8_1))
+		print(self.sm_id, string.format("4.8.1   : %9.3f kvarh", self.r_4_8_1))
+		print(self.sm_id, string.format("1.128.0 : %9.3f kWh", self.r_1_128_0))
 		return "OK"
 	end
 
