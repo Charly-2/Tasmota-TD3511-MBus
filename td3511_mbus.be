@@ -102,7 +102,7 @@ class TD3511MBUS : Driver
 		var v_1_8_0 = payload[12..15].get(0,4)
 		var v_2_8_0 = payload[19..22].get(0,4)
 		var v_3_7_0 = payload[58..61].get(0,4)
-		var v_4_7_0 = payload[66..59].get(0,4)
+		var v_4_7_0 = payload[66..69].get(0,4)
 		var v_3_8_1 = payload[28..31].get(0,4)
 		var v_4_8_1 = payload[38..41].get(0,4)
 		var v_1_128_0 = payload[74..77].geti(0,4)
@@ -167,7 +167,8 @@ class TD3511MBUS : Driver
 			return
 		end
 		if self.ser.available()==101 
-			# we got a SND_UD with data?
+			self.reread_count = 0
+            # we got a SND_UD with data?
 			var message = self.ser.read()
 			#print(message.tohex())
 			if message[0] != 0x68
